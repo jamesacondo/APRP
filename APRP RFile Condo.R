@@ -450,7 +450,7 @@ custom_theme <- theme_minimal() +
 # Disable scientific notation
 options(scipen = 999)
 
-# Currency formatting function with better scaling
+# Currency formatting function
 dollar_format <- function(x) {
   max_val <- max(x, na.rm = TRUE)
   if (max_val > 10000000) {
