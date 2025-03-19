@@ -363,9 +363,6 @@ prediction_results <- predict_with_intervals(main_model, prediction_data)
 # 6. Calculate Median Net Worth by Group
 # ===============================
 
-# Generate predictions
-prediction_results <- predict_with_intervals(main_model, prediction_data)
-
 # Check for outliers or extreme values
 cat("Summary of median net worth before adjustment:\n")
 print(summary(prediction_results$median_net_worth))
@@ -405,25 +402,10 @@ aggregated_results <- prediction_results %>%
   filter(median_net_worth <= quantile(median_net_worth, 0.95, na.rm = TRUE)) %>%
   group_by(geography, race) %>%
   summarize(
-    median_net_worth = weighted.mean(median_net_worth, population, na.rm = TRUE),
-    lower_bound = weighted.mean(lower_net_worth, population, na.rm = TRUE),
-    upper_bound = weighted.mean(upper_net_worth, population, na.rm = TRUE),
+    median_net_worth = weighted.median(median_net_worth, population, na.rm = TRUE),
+    lower_bound = weighted.median(lower_net_worth, population, na.rm = TRUE),
+    upper_bound = weighted.median(upper_net_worth, population, na.rm = TRUE),
     total_population = sum(population, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# Calculate racial wealth gaps
-wealth_gaps <- aggregated_results %>%
-  group_by(geography) %>%
-  summarize(
-    white_net_worth = median_net_worth[race == "White"],
-    black_net_worth = median_net_worth[race == "Black"],
-    wealth_gap = white_net_worth - black_net_worth,
-    wealth_gap_ratio = white_net_worth / black_net_worth,
-    white_lower = lower_bound[race == "White"],
-    white_upper = upper_bound[race == "White"],
-    black_lower = lower_bound[race == "Black"],
-    black_upper = upper_bound[race == "Black"],
     .groups = "drop"
   )
 
